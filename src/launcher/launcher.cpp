@@ -190,8 +190,14 @@ int32_t main(int32_t argc, char* argv[])
 	all_disable_threaded_display();
 
 	// TODO: remember window size.
-	double monitor_scale = zc_get_monitor_scale();
-	int32_t videofail = set_gfx_mode(GFX_AUTODETECT_WINDOWED,zq_screen_w * monitor_scale,zq_screen_h * monitor_scale,0,0);
+	auto [w, h] = zc_get_default_display_size(zq_screen_w, zq_screen_h, -1, -1);
+	int32_t videofail = set_gfx_mode(GFX_AUTODETECT_WINDOWED,w,h,zq_screen_w, zq_screen_h);
+#ifdef ALLEGRO_MACOSX
+	al_resize_display(all_get_display(), w, h);
+#endif
+
+	int xresx = al_get_display_width(all_get_display());
+	int xresy = al_get_display_height(all_get_display());
 	
 	if(videofail)
 	{
@@ -206,9 +212,6 @@ int32_t main(int32_t argc, char* argv[])
 	Z_message("Loading bitmaps..."); //{
 	tmp_scr = create_bitmap_ex(8,zq_screen_w,zq_screen_h);
 	mouse_bmp = create_bitmap_ex(8,16,16);
-	//{ Screen setup
-	screen = create_bitmap_ex(8, zq_screen_w, zq_screen_h);
-	//}
 	
 	if(!(tmp_scr && mouse_bmp && screen))
 	{

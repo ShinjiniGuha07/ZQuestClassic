@@ -4905,7 +4905,7 @@ int main(int argc, char **argv)
 		bool old_sbig = (argc>(res_arg+3))? stricmp(argv[res_arg+3],"big")==0 : 0;
 		bool old_sbig2 = (argc>(res_arg+3))? stricmp(argv[res_arg+3],"big2")==0 : 0;
 	}
-	
+
 	//request_refresh_rate(60);al_trace("Used switch: -fullscreen\n");
 	
 	//is the config file wrong (not zc.cfg!) here? -Z
@@ -4921,16 +4921,22 @@ int main(int argc, char **argv)
 		tempmode=GFX_AUTODETECT_WINDOWED;
 	}
 
-	if(resx < 256) resx = 256;
-	if(resy < 240) resy = 240;
-	
-	double monitor_scale = zc_get_monitor_scale();
-	resx *= monitor_scale;
-	resy *= monitor_scale;
+	if (resx != -1)
+	{
+		if(resx < 256) resx = 256;
+		if(resy < 240) resy = 240;
+	}
+
+	auto [w, h] = zc_get_default_display_size(256, 240, resx, resy);
+	resx = w;
+	resy = h;
 
 	// TODO: consolidate "resx" and "resy" variables with window_width,height.
 	// window_width = resx;
 	// window_height = resy;
+
+	zq_screen_w = 640;
+	zq_screen_h = 480;
 	
 	if(!game_vid_mode(tempmode, wait_ms_on_set_graphics))
 	{
@@ -4981,9 +4987,6 @@ int main(int argc, char **argv)
 	}
 	
 	hw_palette = &RAMpal;
-	zq_screen_w = 640;
-	zq_screen_h = 480;
-	screen = create_bitmap_ex(8, zq_screen_w, zq_screen_h);
 	clear_to_color(screen, BLACK);
 
 	// Initialize render tree.
