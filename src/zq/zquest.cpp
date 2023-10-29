@@ -28122,7 +28122,7 @@ int32_t main(int32_t argc,char **argv)
 	window_width = zc_get_config("zquest","large_window_width",-1);
 	window_height = zc_get_config("zquest","large_window_height",-1);
 #endif
-	auto [w, h] = zc_get_default_display_size(zq_screen_w, zq_screen_h, window_width, window_height);
+	auto [w, h] = zc_get_default_display_size(LARGE_W/2, LARGE_H/2, window_width, window_height);
 	int32_t videofail = is_headless() ? 0 : (set_gfx_mode(tempmode,w,h,zq_screen_w,zq_screen_h));
 
 	//extra block here is intentional
@@ -28173,7 +28173,12 @@ int32_t main(int32_t argc,char **argv)
 			if(new_y + window_h > mh - 72)
 				new_y = mh-72-window_h;
 		}
+#ifdef ALLEGRO_MACOSX
+		if (zc_get_config("zquest","save_window_position",0))
+			al_set_window_position(all_get_display(), new_x, new_y);
+#else
 		al_set_window_position(all_get_display(), new_x, new_y);
+#endif
 	}
 #endif
 

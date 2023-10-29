@@ -416,6 +416,7 @@ static BITMAP * a5_display_init(int w, int h, int vw, int vh, int color_depth)
     // know the actual content height until a resize event.
     // Only seems to be a problem on a M2 Mac that I tried.
     // https://discord.com/channels/993415281244393504/1167992634560745582
+    // TODO remove and patch allegro instead. Except, mainScreen visibleFrame doesn't ever seem to be correct...
     al_resize_display(_a5_display, al_get_display_width(_a5_display), al_get_display_height(_a5_display));
 #endif
 

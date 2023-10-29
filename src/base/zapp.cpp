@@ -197,6 +197,11 @@ std::pair<int, int> zc_get_default_display_size(int base_width, int base_height,
 	int mw = info.x2 - info.x1;
 	int mh = info.y2 - info.y1;
 
+#ifdef ALLEGRO_MACOSX
+	// https://talk.automators.fm/t/getting-screen-dimensions-while-accounting-the-menu-bar-dock-and-multiple-displays/13639
+	mh -= 38;
+#endif
+
 #ifdef _WIN32
 	double monitor_scale = zc_get_monitor_scale();
 	if (saved_width != -1 && saved_height != -1 && saved_width * monitor_scale <= mw && saved_height * monitor_scale <= mh)

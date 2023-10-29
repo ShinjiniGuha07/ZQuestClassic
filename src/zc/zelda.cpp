@@ -4967,6 +4967,10 @@ int main(int argc, char **argv)
 		
 		int new_x = zc_get_config("zeldadx","window_x",0);
 		int new_y = zc_get_config("zeldadx","window_y",0);
+#ifdef ALLEGRO_MACOSX
+		if (new_x && new_y)
+			al_set_window_position(all_get_display(), new_x, new_y);
+#else
 		if (new_x == 0 && new_y == 0)
 		{
 			ALLEGRO_MONITOR_INFO info;
@@ -4976,6 +4980,7 @@ int main(int argc, char **argv)
 			new_y = (info.y2 - info.y1) / 2 - window_h / 2;
 		}
 		al_set_window_position(all_get_display(), new_x, new_y);
+#endif
 	}
 #endif
 	switch_type = pause_in_background ? SWITCH_PAUSE : SWITCH_BACKGROUND;
