@@ -9,6 +9,7 @@
 #include <vector>
 #include <sstream>
 
+#include "app/zapp.h"
 #include "base/qrs.h"
 #include "base/dmap.h"
 #include "base/cpool.h"
@@ -20,9 +21,6 @@
 #include "base/misctypes.h"
 
 #include <stdlib.h>
-
-#include <al5_img.h>
-#include <loadpng.h>
 
 #include "zscriptversion.h"
 #include "sound/zcmusic.h"
@@ -249,7 +247,7 @@ BITMAP     *framebuf, *menu_bmp, *gui_bmp, *scrollbuf, *tmp_bmp, *tmp_scr, *scre
 		   *pricesdisplaybuf, *tb_page[3], *prim_bmp,
 		   *script_menu_buf, *f6_menu_buf;
 BITMAP     *zcmouse[NUM_ZCMOUSE];
-DATAFILE   *sfxdata, *fontsdata, *mididata;
+DATAFILE   *fontsdata, *mididata;
 size_t fontsdat_cnt = 0;
 PALETTE    RAMpal;
 PALETTE    pal_gui;
@@ -381,7 +379,6 @@ int32_t SnapshotFormat, NameEntryMode=0;
 byte SnapshotScale;
 
 char   zeldadat_sig[52]={0};
-char   sfxdat_sig[52]={0};
 char   fontsdat_sig[52]={0};
 char   cheat_goto_dmap_str[4]={0};
 char   cheat_goto_screen_str[3]={0};
@@ -4404,55 +4401,16 @@ int main(int argc, char **argv)
 		}
 	}
 
-	// Before anything else, let's register our custom trace handler:
-	register_trace_handler(zc_trace_handler);
+	zapp_setup_allegro();
+
+	sprintf(zeldadat_sig,"Zelda.Dat %s Build %d",VerStr(ZELDADAT_VERSION), ZELDADAT_BUILD);
+	// sprintf(sfxdat_sig,"SFX.Dat %s Build %d",VerStr(SFXDAT_VERSION), SFXDAT_BUILD);
+	sprintf(fontsdat_sig,"Fonts.Dat %s Build %d",VerStr(FONTSDAT_VERSION), FONTSDAT_BUILD);
 	
 	if(!get_qst_buffers())
 	{
 		Z_error_fatal("Error");
 	}
-
-	all_disable_threaded_display();
-	
-	Z_message("Initializing Allegro... ");
-	if(!al_init())
-	{
-		Z_error_fatal("Failed Init!");
-	}
-	if(allegro_init() != 0)
-	{
-		Z_error_fatal("Failed Init!");
-	}
-
-	// Merge old a4 config into a5 system config.
-	ALLEGRO_CONFIG *tempcfg = al_load_config_file(get_config_file_name());
-	if (tempcfg) {
-		al_merge_config_into(al_get_system_config(), tempcfg);
-		al_destroy_config(tempcfg);
-	}
-
-#ifdef __EMSCRIPTEN__
-	em_mark_initializing_status();
-	em_init_fs();
-#endif
-	
-	if(!al_init_image_addon())
-	{
-		Z_error_fatal("Failed al_init_image_addon");
-	}
-
-	if(!al_init_font_addon())
-	{
-		Z_error_fatal("Failed al_init_font_addon");
-	}
-
-	if(!al_init_primitives_addon())
-	{
-		Z_error_fatal("Failed al_init_primitives_addon");
-	}
-
-	al5img_init();
-	register_png_file_type();
 
 	three_finger_flag=false;
 	
@@ -4473,29 +4431,6 @@ int main(int argc, char **argv)
 	{
 		FFCore.ZScriptConsole(true);
 	}
-	
-	if(install_timer() < 0)
-	{
-		Z_error_fatal(allegro_error);
-	}
-	
-	if(install_keyboard() < 0)
-	{
-		Z_error_fatal(allegro_error);
-	}
-	poll_keyboard();
-	
-	if(install_mouse() < 0)
-	{
-		Z_error_fatal(allegro_error);
-	}
-	
-	if(install_joystick(JOY_TYPE_AUTODETECT) < 0)
-	{
-		Z_error_fatal(allegro_error);
-	}
-	
-	//set_keyboard_rate(1000,160);
 
 	LOCK_FUNCTION(update_throttle_counter);
 	if (install_int_ex(update_throttle_counter, BPS_TO_TIMER(60)) < 0)
@@ -4679,10 +4614,6 @@ int main(int argc, char **argv)
 	Z_message("Loading data files:\n");
 	set_color_conversion(COLORCONV_NONE);
 	
-	sprintf(zeldadat_sig,"Zelda.Dat %s Build %d",VerStrFromHex(ZELDADAT_VERSION), ZELDADAT_BUILD);
-	sprintf(sfxdat_sig,"SFX.Dat %s Build %d",VerStrFromHex(SFXDAT_VERSION), SFXDAT_BUILD);
-	sprintf(fontsdat_sig,"Fonts.Dat %s Build %d",VerStrFromHex(FONTSDAT_VERSION), FONTSDAT_BUILD);
-	
 	packfile_password(datapwd); // Temporary measure. -L
 	
 	Z_message("Fonts.Dat...");
@@ -4705,72 +4636,13 @@ int main(int argc, char **argv)
 	
 	//setPackfilePassword(NULL);
 	packfile_password(NULL);
-	
-	Z_message("SFX.Dat...");
-	
-	if((sfxdata=load_datafile("sfx.dat"))==NULL)
-	{
-		Z_error_fatal("failed to load sfx_dat");
-	}
-	
-	if(strncmp((char*)sfxdata[0].dat,sfxdat_sig,22) || sfxdata[Z35].type != DAT_ID('S', 'A', 'M', 'P'))
-	{
-		Z_error_fatal("\nIncompatible version of sfx.dat.\nPlease upgrade to %s Build %d",VerStrFromHex(SFXDAT_VERSION), SFXDAT_BUILD);
-	}
-	
-	Z_message("OK\n");
 		
 	allocate_crap();
 	
 	//script drawing bitmap allocation
 	zscriptDrawingRenderTarget = new ZScriptDrawingRenderTarget();
 	
-	// initialize sound driver
-	Z_message("Initializing sound driver... ");
-	
-	if(used_switch(argc,argv,"-s") || used_switch(argc,argv,"-nosound") || zc_get_config("zeldadx","nosound",0) || is_headless())
-	{
-		Z_message("skipped\n");
-	}
-	else
-	{
-		if(!al_install_audio())
-		{
-			// We can continue even with no audio.
-			Z_error("Failed al_install_audio");
-		}
-
-		if(!al_init_acodec_addon())
-		{
-			Z_error("Failed al_init_acodec_addon");
-		}
-
-		if(install_sound(DIGI_AUTODETECT,MIDI_AUTODETECT,NULL))
-		{
-			//      Z_error_fatal(allegro_error);
-			Z_message("Sound driver not available.  Sound disabled.\n");
-		}
-		else
-		{
-			Z_message("OK\n");
-		}
-	}
-	
 	Z_init_sound();
-	
-	
-	// CD player
-	
-	/*
-	  if(used_switch(argc,argv,"-cd"))
-	  {
-	  printf("Initializing CD player... ");
-	  if(cd_init())
-	  Z_error_fatal("Error");
-	  printf("OK\n");
-	  useCD = true;
-	  }
-	  */
 	
 	const int32_t wait_ms_on_set_graphics = 20; //formerly 250. -Gleeok
 
