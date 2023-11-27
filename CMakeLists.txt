@@ -697,7 +697,7 @@ endif()
 add_executable(zeditor ${ZQUEST_CORE_SOURCES} ${ZQUEST_GUI_SOURCES} ${ZQUEST_MISC_SOURCES} ${ZQUESTEXTRASOURCES} ${ZQUEST_MODULES})
 set_property(TARGET zeditor PROPERTY VS_DPI_AWARE "PerMonitor")
 
-target_link_libraries(zeditor PUBLIC allegro_with_legacy zconsolelogger zcbase zcgui zcsound ${IMAGELIBS} ${ZQUESTLIBSEXTRA})
+target_link_libraries(zeditor PUBLIC allegro_with_legacy zapp zconsolelogger zcbase zcgui zcsound ${IMAGELIBS} ${ZQUESTLIBSEXTRA})
 target_include_directories(zeditor PRIVATE src)
 
 if(MSVC)
@@ -742,7 +742,7 @@ endif()
 add_executable(zlauncher ${LAUNCHER_SOURCES} ${LAUNCHER_GUI_SOURCES} ${LAUNCHEREXTRASOURCES})
 target_compile_definitions(zlauncher PRIVATE IS_LAUNCHER)
 set_property(TARGET zlauncher PROPERTY VS_DPI_AWARE "PerMonitor")
-target_link_libraries(zlauncher PRIVATE allegro_with_legacy zcbase zcgui zconsolelogger ${LAUNCHERLIBSEXTRA})
+target_link_libraries(zlauncher PRIVATE allegro_with_legacy zapp zcbase zcgui zconsolelogger ${LAUNCHERLIBSEXTRA})
 
 #############################################################
 # Standalone

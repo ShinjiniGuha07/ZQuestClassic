@@ -1,5 +1,6 @@
 #include "compilezscript.h"
 #include <gui/builder.h>
+#include "app/zapp.h"
 #include "zq/zquest.h"
 #include "alert.h"
 #include "alertfunc.h"
