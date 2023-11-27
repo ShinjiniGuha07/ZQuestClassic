@@ -434,7 +434,6 @@ int32_t lens_hint_weapon[MAXWPNS][5];                           //aclk, aframe, 
 int32_t tempmode=GFX_AUTODETECT;
 RGB_MAP zq_rgb_table;
 COLOR_MAP trans_table, trans_table2;
-char *datafile_str;
 DATAFILE *zcdata=NULL;
 MIDI *song=NULL;
 BITMAP *menu1, *menu3, *mapscreenbmp, *tmp_scr, *screen2, *mouse_bmp[MOUSE_BMP_MAX][4], *mouse_bmp_1x[MOUSE_BMP_MAX][4], *icon_bmp[ICON_BMP_MAX][4], *flag_bmp[16][4], *select_bmp[2], *dmapbmp_small, *dmapbmp_large;
@@ -726,9 +725,7 @@ byte                use_cheats;
 byte                use_tiles;
 // Note: may not be null-terminated (must refactor writecolordata to fix).
 char                palnames[MAXLEVELS][17];
-char                fontsdat_sig[52];
 char                zquestdat_sig[52];
-char                sfxdat_sig[52];
 char		    qstdat_str[2048];
 
 int32_t gme_track=0;
@@ -26294,25 +26291,10 @@ int32_t main(int32_t argc,char **argv)
 	
 	if((zcdata=load_datafile(moduledata.datafiles[zquest_dat]))==NULL)
 		FatalConsole("failed to load zquest.dat");
-	
-	datafile_str=moduledata.datafiles[zquest_dat];
+
 	Z_message("OK\n");
 	
-	
-	//setPackfilePassword(NULL);
 	packfile_password("");
-	
-	sprintf(sfxdat_sig,"SFX.Dat %s Build %d",VerStrFromHex(SFXDAT_VERSION), SFXDAT_BUILD);
-	
-	Z_message("SFX.Dat...");
-	
-	if((sfxdata=load_datafile(moduledata.datafiles[sfx_dat]))==NULL)
-		FatalConsole("Failed to load sfx.dat!\n");
-	
-	if(strncmp((char*)sfxdata[0].dat,sfxdat_sig,22) || sfxdata[Z35].type != DAT_ID('S', 'A', 'M', 'P'))
-		FatalConsole("\nIncompatible version of sfx.dat.\nPlease upgrade to %s Build %d",VerStrFromHex(SFXDAT_VERSION), SFXDAT_BUILD);
-	
-	Z_message("OK\n");
 	
 	int32_t helpsize = file_size_ex_password("docs/zquest.txt","");
 	

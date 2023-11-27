@@ -130,7 +130,6 @@ extern int32_t lens_hint_weapon[MAXWPNS][5];                    //aclk, aframe, 
 //extern int32_t mode, switch_mode, orig_mode;
 extern RGB_MAP rgb_table;
 extern COLOR_MAP trans_table, trans_table2;
-extern char *datafile_str;
 extern RGB_MAP zq_rgb_table;
 extern DATAFILE *zcdata;
 extern MIDI *song;
