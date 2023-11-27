@@ -26578,37 +26578,7 @@ int32_t main(int32_t argc,char **argv)
 	zcmixer = zcmixer_create();
 	install_int_ex([](){ zcmusic_poll(); }, MSEC_TO_TIMER(25));
 
-	switch(zqColorDepth) //defaults to 8bit
-	{
-	case 0:
-		set_color_depth(desktop_color_depth());
-		break;
-		
-	case 8:
-		set_color_depth(8);
-		break;
-		
-	case 15:
-		set_color_depth(15);
-		break;
-		
-	case 16:
-		set_color_depth(16);
-		break;
-		
-	case 24:
-		set_color_depth(24);
-		break;
-		
-	case 32:
-		set_color_depth(32);
-		break;
-		
-	default:
-		zqColorDepth = 8;
-		set_color_depth(8);
-		break;
-	}
+	set_color_depth(8);
 	
 	set_close_button_callback((void (*)()) hit_close_button);
 	
@@ -26641,7 +26611,6 @@ int32_t main(int32_t argc,char **argv)
 
 	set_window_title("ZC Editor");
 
-	initFonts();
 	load_size_poses();
 
 	if (!is_headless())

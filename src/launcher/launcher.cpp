@@ -140,7 +140,6 @@ int32_t main(int32_t argc, char* argv[])
 	}
 
 	set_window_title("ZQuest Classic Launcher");
-	initFonts();
 	zapp_create_window();
 
 	Z_message("Loading bitmaps..."); //{

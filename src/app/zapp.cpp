@@ -1,10 +1,11 @@
 #include "app/zapp.h"
+#include "base/fonts.h"
 #include "base/module.h"
 #include "base/render.h"
 #include "base/version.h"
 #include "base/zapp.h"
-#include "base/zdefs.h"
 #include "base/zc_alleg.h"
+#include "base/zdefs.h"
 #include "base/zsys.h"
 #include "sfx.h"
 #include "zinfo.h"
@@ -195,4 +196,5 @@ void zapp_create_window()
 {
 	// TODO: move window creation stuff to here.
 	zapp_setup_icon();
+	initFonts();
 }
